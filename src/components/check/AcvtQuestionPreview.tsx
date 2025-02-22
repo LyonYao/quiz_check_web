@@ -26,6 +26,7 @@ export const AcvtQuestionPreview: React.FC = () => {
     const { setPageInfo } = React.useContext(PageInfoContext)!;
     const [questions, setQuestions] = useState<string[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+    const [currentQuestionIndexStr, setCurrentQuestionIndexStr] = useState('1');
     const [timer, setTimer] = useState<number| null>();
     const [currentQuestion,setCurrentQuestion]  =useState<Question>();
 
@@ -84,14 +85,21 @@ export const AcvtQuestionPreview: React.FC = () => {
     }
     useEffect(()=>{
         if(questions && questions[currentQuestionIndex]){
-            if (timer) clearTimeout(timer);
-            setTimer(window.setTimeout(() => { 
                 fetchQuestion();
-            }, 800));
-           
         }
 
     },[questions,currentQuestionIndex]);
+    
+    useEffect(()=>{
+        let pageId= parseInt(currentQuestionIndexStr);
+        if (timer) clearTimeout(timer);
+        if(!Number.isNaN(pageId)){
+            setTimer(window.setTimeout(() => { 
+                setCurrentQuestionIndex(pageId-1);
+            }, 800));
+        }
+
+    },[currentQuestionIndexStr]);
 
     const handleNext = () => {
         if (currentQuestionIndex < questions.length - 1) {
@@ -119,8 +127,10 @@ export const AcvtQuestionPreview: React.FC = () => {
                                 label="题目#"
                                 type="text"
                                 sx={{maxWidth:'80px'}}
-                                value={currentQuestionIndex+1}
-                                onChange={(e) => {setCurrentQuestionIndex(parseInt((e.target.value+'').trim())-1); }} 
+                                value={currentQuestionIndexStr}
+                                onChange={(e) => {
+                                    setCurrentQuestionIndexStr((e.target.value+'').trim());
+                                }                                } 
 
                             />  / {questions.length}
                     </Typography>
