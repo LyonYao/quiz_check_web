@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
-import { AppBar, Toolbar, Typography, Box, Container, CssBaseline, Paper, Grid, useTheme } from '@mui/material';
+import { AppBar, Toolbar, Typography, Box, Container, CssBaseline, Paper, Grid, useTheme, Backdrop, CircularProgress } from '@mui/material';
 import { Route, Routes, Outlet } from 'react-router-dom';
 import { PageInfoProvider, PageInfoContext } from './PageInfoContext'; // 引入上下文
 
 export const Layout: React.FC = () => {
   const theme = useTheme();
-  const { pageInfo } = useContext(PageInfoContext)!;
+  const { pageInfo , callAPIing } = useContext(PageInfoContext)!;
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '110vh' }}>
@@ -27,12 +27,24 @@ export const Layout: React.FC = () => {
               {pageInfo}
             </Typography>
             <Typography variant="h5" component="div" sx={{ color: '#fff', marginLeft: '20px',marginTop:'-40px' }}>
-              活动管理系统
+              Quzi Study & Check
             </Typography>
               
           </Toolbar>
           <Typography  gutterBottom sx={{   textAlign: 'right', paddingRight:'10px' }}>
-              overline text 333333333333333333333333333333333333333333
+              {(() => {
+                const [currentTime, setCurrentTime] = React.useState(new Date().toLocaleString());
+
+                React.useEffect(() => {
+                  const timer = setInterval(() => {
+                    setCurrentTime(new Date().toLocaleString());
+                  }, 1000);
+
+                  return () => clearInterval(timer);
+                }, []);
+
+                return currentTime;
+              })()}
               </Typography>
           
         </AppBar>
@@ -54,10 +66,27 @@ export const Layout: React.FC = () => {
             Hello World
           </Typography>
           <Typography variant="subtitle1" align="center">
-            © {new Date().getFullYear()} Lyon Yao
+            © {new Date().getFullYear()} Lyon 
+
           </Typography>
+          <Typography variant="subtitle2" align="center" sx={{
+                fontSize: '0.8rem', // 调整字体大小
+                color: '#a9a9a9',  // 淡灰色
+            }}>该网站所有题目均来源于网络搜集分析，并非任何官方题目。
+            <br/>
+            题目用来参考学习预估，计算正确率不代表任何考试通过率
+            <br/>
+            该网站不会搜集你任何信息，注册可以使用昵称代替，系统3个月之后自动删除注册及答题结果
+            </Typography>
         </Container>
       </Box>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 888 }}
+        open={callAPIing}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Box>
+    
   );
 };

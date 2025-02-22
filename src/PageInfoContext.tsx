@@ -9,22 +9,24 @@ interface PageInfoContextType {
 
   themeMode: 'light' | 'dark';
   setThemeMode: (mode: 'light' | 'dark') => void;
+
+  callAPIing: boolean;
+  setCallAPIing: (callAPIing: boolean) => void;
 }
 
 export const PageInfoContext = createContext<PageInfoContextType | undefined>(undefined);
-
 export const PageInfoProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [pageInfo, setPageInfo] = useState<string>('');
   const [userStatus, setUserStatus] = useState<string>('guest');
   const [themeMode, setThemeMode] = useState<'light' | 'dark'>('light');
-
+  const [callAPIing, setCallAPIing] = useState<boolean>(false);
   const contextValue = {
     pageInfo,
     setPageInfo,
     userStatus,
     setUserStatus,
     themeMode,
-    setThemeMode,
+    setThemeMode,callAPIing, setCallAPIing,
   };
 
   return (

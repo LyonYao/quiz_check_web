@@ -9,9 +9,28 @@ import {SubjectList} from './components/subject/SubjectList';
 import About from './components/About';
 import { PageInfoProvider } from './PageInfoContext';
 import { SubjectDetail } from './components/subject/SubjectDetail';
-import SubjectCheck from './components/subject/SubjectCheck';
+import SubjectCheck from './components/check/SubjectCheck';
 import { ContentEdit } from './components/ContentEdit';
-const theme = createTheme();
+import CheckHistory from './components/check/CheckHistory';
+import QuestionPreview from './components/check/QuestionPreview';
+import { AcvtQuestionPreview } from './components/check/AcvtQuestionPreview';
+const theme = createTheme({
+  palette: {
+    primary: {
+      // 主色调变浅
+      main: '#6b9bf0', // 假设这是你想用的更浅的颜色
+    },
+  },
+  components: {
+    MuiButton: {
+      styleOverrides: {
+        root: {
+          borderRadius: 30, // 设置圆角半径
+        },
+      },
+    },
+  },
+});
 
 function App() {
   return (
@@ -27,8 +46,11 @@ function App() {
             <Route path="/activity/detail/:id" element={<Detail />} />
             <Route path="/activity/:aid/subject" element={<SubjectList/>} />
             <Route path="/activity/:aid/subject/detail/:sid" element={<SubjectDetail/>} />
-            <Route path="/activity/:aid/subject/check/:sid" element={<SubjectCheck />} />
+            <Route path="/check/:aid/:sid" element={<SubjectCheck />} />
+            <Route path="/check/history/:aId/:regCde" element={<CheckHistory />} />
+            <Route path="/check/preview-q/:aId" element={<AcvtQuestionPreview />} />
             <Route path="/sim/content-edit" element={<ContentEdit />} />
+            <Route path="/sim/preview-q" element={<QuestionPreview />} />
             <Route path="*" element={<div>Not Found</div>} />
             
             

@@ -4,98 +4,57 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import { useParams } from 'react-router-dom';
 import { PageInfoContext } from '../../PageInfoContext';
-
-const mockData = [
-  {
-    id: '001',
-    title: 'React 入门课程',
-    description: '学习 React 的基础知识和应用。',
-  },
-  {
-    id: '002',
-    title: '高级 JavaScript',
-    description: '深入理解 JavaScript 的高级概念。深入理解 JavaScript 的高级概念。深入理解 JavaScript 的高级概念。深入理解 JavaScript 的高级概念。深入理解 JavaScript 的高级概念。',
-  },
-  {
-    id: '003',
-    title: '全栈开发',
-    description: '掌握前端和后端开发技能。',
-  },
-];
-
-const activityData = [
-  {
-    "id": "001",
-    "name": "2024 AWS Share",
-    "startTime": "2024-03-15T09:00:00Z",
-    "endTime": "2024-03-15T17:00:00Z",
-    "status": "即将开始",
-    "location": "线上活动 - AWS 平台",
-    "description": "深入探讨AWS最新技术和服务，为开发者提供实战技巧。",
-    "fee": "免费"
-  },
-  {
-    "id": "002",
-    "name": "2024 数据科学研讨会",
-    "startTime": "2024-04-22T10:00:00Z",
-    "endTime": "2024-04-22T18:00:00Z",
-    "status": "报名中",
-    "location": "北京市朝阳区某会议中心",
-    "description": "聚焦数据科学前沿话题，与业内专家面对面交流。",
-    "fee": "¥200"
-  },
-  {
-    "id": "003",
-    "name": "2024 AI 开发者大会",
-    "startTime": "2024-06-10T08:30:00Z",
-    "endTime": "2024-06-12T17:00:00Z",
-    "status": "已满员",
-    "location": "线上活动 - Zoom",
-    "description": "涵盖AI开发的所有方面，从理论到实践，全面覆盖。",
-    "fee": "¥500"
-  },
-  {
-    "id": "004",
-    "name": "2024 AI 开发者大会",
-    "startTime": "2024-06-10T08:30:00Z",
-    "endTime": "2024-06-12T17:00:00Z",
-    "status": "已满员",
-    "location": "线上活动 - Zoom",
-    "description": "涵盖AI开发的所有方面，从理论到实践，全面覆盖。",
-    "fee": "¥500"
-  },
-  {
-    "id": "005",
-    "name": "2024 AI 开发者大会",
-    "startTime": "2024-06-10T08:30:00Z",
-    "endTime": "2024-06-12T17:00:00Z",
-    "status": "已满员",
-    "location": "线上活动 - Zoom",
-    "description": "涵盖AI开发的所有方面，从理论到实践，全面覆盖。",
-    "fee": "¥500"
-  },
-  {
-    "id": "006",
-    "name": "2024 AI 开发者大会",
-    "startTime": "2024-06-10T08:30:00Z",
-    "endTime": "2024-06-12T17:00:00Z",
-    "status": "已满员",
-    "location": "线上活动 - Zoom",
-    "description": "涵盖AI开发的所有方面，从理论到实践，全面覆盖。",
-    "fee": "¥500"
-  }
-];
+import apiFetch from '../../api';
+import { Subject } from './Subject';
 export const SubjectList: React.FC = () => {
-
+  const [msg, setMsg] = React.useState<string>('Loading');
   const { aid } = useParams<{ aid: string }>();
-  const activity = activityData.find(acty => acty.id === aid);
   const { setPageInfo } = React.useContext(PageInfoContext)!;
-  if(activity&&activity.name){
-    setPageInfo(activity.name);
-  }
+  const [subjectList, setSubjectList] = React.useState<Subject[]>([]);
+  //user APi to get acitvity via aid
+  React.useEffect(() => {
+    const fetchActivity = async () => {
+      try {
+        const data = await apiFetch('activity/get', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({id:aid}),
+        });
+        if(data.length === 0){
+          setPageInfo('No activity data available');
+        }else{
+          setPageInfo(data.name);
+        }
+      } catch (error) {
+        console.error('Error fetching activity data:', error);
+      }
+    };
+    const fetchSubjectList = async () => {
+      try {
+        const data = await apiFetch('subject/list', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({aid:aid}),
+        });
+        if(data.length === 0){
+          setMsg('No data available');
+        }else{
+          setSubjectList(data);
+        }
+      } catch (error) {
+        console.error('Error fetching subject data:', error);
+      }
+    };
+    fetchActivity();
+    fetchSubjectList();
+  }, [aid]); 
   return (
     <Box sx={{ p: 2 }}>
-      <TableContainer component={Paper}>
+      {subjectList && subjectList.length>0? (<TableContainer component={Paper}>
         <Table>
           <TableHead sx={{ backgroundColor: '#f5f5f5',fontSize:'medium' }}>
             <TableRow>
@@ -106,7 +65,7 @@ export const SubjectList: React.FC = () => {
             </TableRow>
           </TableHead>
           <TableBody>
-            {mockData.map((subject, index) => (
+            {subjectList.map((subject, index) => (
               <TableRow key={subject.id}>
                 <TableCell>{index + 1}</TableCell>
                 <TableCell>
@@ -121,13 +80,21 @@ export const SubjectList: React.FC = () => {
                 <TableCell>
                   <Tooltip title={subject.description}>
                     <span>
-                      {subject.description.length > 30
-                        ? `${subject.description.substring(0, 30)}...`
+                      {subject.description.length > 40
+                        ? `${subject.description.substring(0, 40)}...`
                         : subject.description}
                     </span>
                   </Tooltip>
                 </TableCell>
                 <TableCell align="right" sx={{ whiteSpace: 'nowrap' }}>
+                  {subject.status=='C' && <Button
+                      variant="outlined"
+                      color="secondary"
+                      startIcon={<CheckCircleIcon />}
+                      href={'/check/'+ aid +'/'+subject.id}
+                    >
+                      答题
+                    </Button>}
                   <Button
                     variant="contained"
                     color="primary"
@@ -137,20 +104,14 @@ export const SubjectList: React.FC = () => {
                   >
                     查看
                   </Button>
-                  <Button
-                    variant="outlined"
-                    color="secondary"
-                    startIcon={<CheckCircleIcon />}
-                    href={'/activity/' + aid + '/subject/check/'+subject.id}
-                  >
-                    检查
-                  </Button>
+                 
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
-      </TableContainer>
+      </TableContainer>):<p>{msg}</p>
+    }
     </Box>
   );
 };

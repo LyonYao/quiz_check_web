@@ -2,7 +2,7 @@
 
 quiz check是一个针对学习后的检查，意在帮助学习的朋友及时检查学习和随机回顾学习内容已达到巩固的效果。
 
-
+https://d1znt1dw5w5pze.cloudfront.net/
 
 
 # Material UI - Create React App example in TypeScript
