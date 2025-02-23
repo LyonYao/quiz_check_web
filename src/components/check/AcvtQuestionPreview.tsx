@@ -74,6 +74,7 @@ export const AcvtQuestionPreview: React.FC = () => {
             });
             if(!data.error){
                 setCurrentQuestion(data.question);
+                setCurrentQuestionIndexStr((currentQuestionIndex+1)+'');
               }else{
                 setLoadQuestionMsg(data.error);
               }
